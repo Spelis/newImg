@@ -1,5 +1,4 @@
 #include <iostream>
-#include "include/BitmapPlusPlus.hpp"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "include/stb_image_write.h"
 #include <sstream>
@@ -32,11 +31,6 @@ std::string basename(std::string filename)
 
 namespace fs = std::filesystem;
 
-bool file_exists(const fs::path &path)
-{
-    return fs::exists(path) && fs::is_regular_file(path);
-}
-
 int fail() {
     std::cout << "Errors Occured... Press Enter to exit...";
     getch();
@@ -47,15 +41,11 @@ int main(int argc, char *argv[])
 {
     try
     {
+        srand(time(NULL));
         std::cout << "[INFO]: Creating New Image from " << argv[1] << std::endl;
         if (argc != 2)
         {
             std::cerr << "[ERROR]: Too few or too many arguments: " << std::to_string(argc) << std::endl;
-            return fail();
-        }
-        if (!file_exists(argv[1]))
-        {
-            std::cerr << "[ERROR]: File does not exist: " << argv[1] << std::endl;
             return fail();
         }
 
@@ -64,18 +54,15 @@ int main(int argc, char *argv[])
         std::vector<int> sz = {atoi(szs.at(0).c_str()), atoi(szs.at(1).c_str())};
         std::cout << "[INFO]: File: " << file.at(0) << "." << file.at(2) << " at size: " << file.at(1) << std::endl;
 
-        bmp::Bitmap image(sz.at(0), sz.at(1));
-        image.clear(bmp::Black);
-
         std::vector<unsigned char> rgbaData(sz.at(0) * sz.at(1) * 4); // Ensure correct size
         int index = 0;
 
-        for (bmp::Pixel &pixel : image)
+        for (int i = 0; i < sz.at(0) * sz.at(1); i++)
         {
-            rgbaData[index++] = pixel.r; // R
-            rgbaData[index++] = pixel.g; // G
-            rgbaData[index++] = pixel.b; // B
-            rgbaData[index++] = 0;       // A
+            rgbaData[index++] = rand()%255; // R
+            rgbaData[index++] = rand()%255; // G
+            rgbaData[index++] = rand()%255; // B
+            rgbaData[index++] = 255;       // A
         }
 
         try
@@ -100,11 +87,6 @@ int main(int argc, char *argv[])
         std::cout << "[INFO]: File saved successfully!" << std::endl;
 
         return EXIT_SUCCESS;
-    }
-    catch (const bmp::Exception &e)
-    {
-        std::cerr << "[BMP ERROR]: " << e.what() << std::endl;
-        return fail();
     }
     catch (const std::exception &e)
     {
