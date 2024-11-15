@@ -13,5 +13,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: make
+    - name: Make Executable
       run: make noicon
+    - name: Create Archive
+      run: |
+        mkdir dist
+        cp build/* dist/
+        cd dist
+        zip -r ../dist.zip .
+    - name: Upload release asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/dist.zip
+        asset_name: nimg-build-${{ github.ref }}.zip
+        asset_content_type: application/zip
