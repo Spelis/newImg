@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <filesystem>
+#include <conio.h>
 
 std::vector<std::string> split_string(const std::string &str, const std::string &delim)
 {
@@ -36,6 +37,12 @@ bool file_exists(const fs::path &path)
     return fs::exists(path) && fs::is_regular_file(path);
 }
 
+int fail() {
+    std::cout << "Errors Occured... Press Enter to exit...";
+    getch();
+    return EXIT_FAILURE;
+}
+
 int main(int argc, char *argv[])
 {
     try
@@ -44,12 +51,12 @@ int main(int argc, char *argv[])
         if (argc != 2)
         {
             std::cerr << "[ERROR]: Too few or too many arguments: " << std::to_string(argc) << std::endl;
-            return EXIT_FAILURE;
+            return fail();
         }
         if (!file_exists(argv[1]))
         {
             std::cerr << "[ERROR]: File does not exist: " << argv[1] << std::endl;
-            return EXIT_FAILURE;
+            return fail();
         }
 
         std::vector<std::string> file = split_string(basename(argv[1]), ".");
@@ -97,11 +104,11 @@ int main(int argc, char *argv[])
     catch (const bmp::Exception &e)
     {
         std::cerr << "[BMP ERROR]: " << e.what() << std::endl;
-        return EXIT_FAILURE;
+        return fail();
     }
     catch (const std::exception &e)
     {
         std::cerr << "[ERROR]: " << e.what() << std::endl;
-        return EXIT_FAILURE;
+        return fail();
     }
 }
