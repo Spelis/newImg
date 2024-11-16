@@ -6,6 +6,7 @@
 #include <string>
 #include <filesystem>
 #include <conio.h>
+#include <chrono>
 
 std::vector<std::string> split_string(const std::string &str, const std::string &delim)
 {
@@ -31,10 +32,10 @@ std::string basename(std::string filename)
 
 namespace fs = std::filesystem;
 
-int fail() {
-    std::cout << "Errors Occured... Press Enter to exit...";
+int fail(int code = 10) {
+    std::cout << "Error " << std::to_string(code) <<" Occured... Press Enter to exit...";
     getch();
-    return EXIT_FAILURE;
+    return code;
 }
 
 int main(int argc, char *argv[])
@@ -42,17 +43,15 @@ int main(int argc, char *argv[])
     try
     {
         srand(time(NULL));
-        std::cout << "[INFO]: Creating New Image from " << argv[1] << std::endl;
         if (argc != 2)
         {
             std::cerr << "[ERROR]: Too few or too many arguments: " << std::to_string(argc) << std::endl;
-            return fail();
+            return fail(1);
         }
 
         std::vector<std::string> file = split_string(basename(argv[1]), ".");
         std::vector<std::string> szs = split_string(file.at(1), "x");
         std::vector<int> sz = {atoi(szs.at(0).c_str()), atoi(szs.at(1).c_str())};
-        std::cout << "[INFO]: File: " << file.at(0) << "." << file.at(2) << " at size: " << file.at(1) << std::endl;
 
         std::vector<unsigned char> rgbaData(sz.at(0) * sz.at(1) * 4); // Ensure correct size
         int index = 0;
@@ -68,11 +67,11 @@ int main(int argc, char *argv[])
         try
         {
             fs::remove(argv[1]);
-            std::cout << "[INFO]: File deleted successfully" << std::endl;
         }
         catch (const fs::filesystem_error &e)
         {
             std::cerr << "[ERROR]: Error deleting file: " << e.what() << std::endl;
+            fail(2);
         }
 
         fs::path finalpath = (file.at(0) + "." + file.at(2));
@@ -81,16 +80,14 @@ int main(int argc, char *argv[])
                             sz.at(0), sz.at(1), 4, rgbaData.data(),
                             sz.at(0) * 4))
         {
-            throw std::runtime_error("[ERROR]: Failed to write PNG image");
+            return fail(3);
         }
-
-        std::cout << "[INFO]: File saved successfully!" << std::endl;
 
         return EXIT_SUCCESS;
     }
     catch (const std::exception &e)
     {
         std::cerr << "[ERROR]: " << e.what() << std::endl;
-        return fail();
+        return fail(4);
     }
 }

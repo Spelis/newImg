@@ -15,3 +15,9 @@ There are probably several ways to do it, but I use this one:
 * navigate to the nimg executable and select it.
 * make sure you select "always use this app to open .nimg files"
 * now, whenever you double click a .nimg file, it will open in nimg.
+## Exit Codes
+* 0: success
+* 1: incorrect argument amount
+* 2: error deleting file
+* 3: error saving image
+* 4: other error
