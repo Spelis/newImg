@@ -5,3 +5,7 @@ o/
 # Added by cargo
 
 /target
+
+# Manual labor motherfucker (or something like that)
+
+Cargo.lock
